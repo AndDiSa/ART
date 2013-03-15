@@ -1,9 +1,14 @@
 package de.anddisa.remotebackup;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,6 +71,35 @@ public class AdbWrapper {
 		}
 	}
 
+	public static boolean compareMD5(String srcFileName, String md5FileName) throws IOException, NoSuchAlgorithmException {
+		String md5sum = md5sum(srcFileName);
+        File f = new File(md5FileName);
+        InputStream is = new FileInputStream(f);
+        byte[] buffer = new byte[32];
+        is.read(buffer);
+        String s = new String(buffer);
+        is.close();
+        boolean result = md5sum.equals(s);
+        if (!result) {
+        	System.err.println(srcFileName + "(" + md5sum + ") <-> " + md5FileName + "(" + s + ")");
+        }
+        return result;
+	}
+	
+	public static String md5sum(String fileName) throws IOException, NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        File f = new File(fileName);
+        InputStream is = new FileInputStream(f);
+        byte[] buffer = new byte[8192];
+        int read = 0;
+        while( (read = is.read(buffer)) > 0)
+                md.update(buffer, 0, read);
+        byte[] md5 = md.digest();
+        BigInteger bi = new BigInteger(1, md5);
+        is.close();
+        return bi.toString(16);	
+	}
+	
 	private static long TIME0UT = 5000;
 	
 	private static IDeviceManager deviceManager = DeviceManager.getInstance();
@@ -277,6 +311,15 @@ public class AdbWrapper {
 		}
 	}
 
+	public boolean getPartitionMD5(String partitionName, String md5FileName) {
+		PartitionInfo selectedPartition = selectedDevice.getPartition(partitionName);
+		if (selectedPartition != null && selectedPartition.deviceName != null && !"".equals(selectedPartition.deviceName)) {
+			return getFileSystemImageMD5(selectedPartition.deviceName, md5FileName);
+		} else {
+			return false;
+		}
+	}
+	
 	private boolean getFileSystemAsImage(String partitionDefinition, String imageFileName) {
 		boolean result = true;
 
@@ -328,6 +371,19 @@ public class AdbWrapper {
 		try {
 			catCommandExecutor.join();
 		} catch (InterruptedException e) {
+			result = false;
+		}
+		return result;
+	}
+
+	private boolean getFileSystemImageMD5(String partitionDefinition, String md5FileName) {
+		boolean result = true;
+
+		final String md5sumString = "busybox md5sum " + partitionDefinition;
+
+		try {
+			selectedDevice.executeShellCommand(getRootExecutableCommand(md5sumString), new FileReceiver(md5FileName));
+		} catch (DeviceNotAvailableException e) {
 			result = false;
 		}
 		return result;
