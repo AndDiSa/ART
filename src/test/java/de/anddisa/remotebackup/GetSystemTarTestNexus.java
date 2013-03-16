@@ -15,12 +15,12 @@ public class GetSystemTarTestNexus {
 	}
 
 	@Test
-	public void testGetSystemTar() {
+	public void testGetSystemTar() throws Exception {
 		Assert.assertTrue(adbWrapper.getSytemPartitionAsTar("/home/ds/temp"));
 	}
 
 	@Test
-	public void testGetDataTar() {
+	public void testGetDataTar() throws Exception {
 		Assert.assertTrue(adbWrapper.getDataPartitionAsTar("/home/ds/temp"));
 	}
 }

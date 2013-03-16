@@ -15,17 +15,17 @@ public class GetSystemTarTestG1 {
 	}
 
 	@Test
-	public void testGetSystemTar() {
+	public void testGetSystemTar() throws Exception {
 		Assert.assertTrue(adbWrapper.getSytemPartitionAsTar("/tmp"));
 	}
 
 	@Test
-	public void testGetDataTar() {
+	public void testGetDataTar() throws Exception {
 		Assert.assertTrue(adbWrapper.getDataPartitionAsTar("/tmp"));
 	}
 
 	@Test
-	public void testGetExtTar() {
+	public void testGetExtTar() throws Exception {
 		Assert.assertTrue(adbWrapper.getExtPartitionAsTar("/tmp"));
 	}
 }
