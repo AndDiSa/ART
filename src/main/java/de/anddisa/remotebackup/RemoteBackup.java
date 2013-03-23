@@ -14,7 +14,10 @@
  */
 package de.anddisa.remotebackup;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -24,6 +27,10 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import de.anddisa.adb.device.DeviceNotAvailableException;
+import de.anddisa.adb.device.ITestDevice;
+import de.anddisa.adb.device.ITestDevice.PartitionInfo;
 
 public class RemoteBackup {
 
@@ -43,6 +50,10 @@ public class RemoteBackup {
 				.withLongOpt("devices")
 				.withDescription("list available devices")
 				.create("devices"));
+		commands.addOption(OptionBuilder
+				.withLongOpt("info")
+				.withDescription("info for devices")
+				.create("info"));
 		commands.addOption(OptionBuilder
 				.withLongOpt("help")
 				.withDescription("print help")
@@ -97,23 +108,29 @@ public class RemoteBackup {
         return "";
     }
 
-    private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException {
-        if ((null != cl) && cl.hasOption("backup")) {
-        	return doBackup(cl);
-        }
-        if ((null != cl) && cl.hasOption("restore")) {
-        	return doRestore(cl);
-        }
+    private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException, ParseException {
+    	String adb = cl.getOptionValue("adb", null);
+		AdbWrapper adbWrapper = new AdbWrapper(adb);
+		String serial = cl.getOptionValue("serial", null);
+		adbWrapper.selectDevice(serial);
         if ((null != cl) && cl.hasOption("devices")) {
             // do something with devices
-        	return doDevices(cl);
+        	return doDevices(adbWrapper, cl);
+        }
+       if ((null != cl) && cl.hasOption("backup")) {
+        	return doBackup(adbWrapper, cl);
+        }
+        if ((null != cl) && cl.hasOption("restore")) {
+        	return doRestore(adbWrapper, cl);
+        }
+        if ((null != cl) && cl.hasOption("info")) {
+            // do something with devices
+        	return doInfo(adbWrapper, cl);
         }
         return outputCommandLineHelp(options);
     }
 
-	private static String doDevices(CommandLine cl) {
-		String adb = cl.getOptionValue("adb", null);
-		AdbWrapper adbWrapper = new AdbWrapper(adb);
+	private static String doDevices(AdbWrapper adbWrapper, CommandLine cl) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("connected devices:");
 		sb.append('\n');
@@ -125,14 +142,81 @@ public class RemoteBackup {
 		return sb.toString();
 	}
 
-	private static String doRestore(CommandLine cl) {
+	private static String doInfo(AdbWrapper adbWrapper, CommandLine cl) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Partitions:");
+		sb.append('\n');
+		sb.append("Type StartBlock BlockCount PartitionName FlashFileName DeviceName mountPoint");
+		sb.append('\n');
+		sb.append("----------------------------------------------------------------------------");
+		sb.append('\n');
+		try {
+			ITestDevice currentDevice = adbWrapper.getCurrentDevice();
+			if (currentDevice != null) {
+				List<PartitionInfo> partitionInfos = currentDevice.getPartitionInfo();
+				for (PartitionInfo partitionInfo : partitionInfos) {
+					sb.append(partitionInfo.toString());
+					sb.append('\n');
+				}
+			} else {
+				sb.append("error: device not available ...");
+				sb.append('\n');
+				
+			}
+		} catch (DeviceNotAvailableException e) {
+			sb.append("error: device not available ...");
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+
+	private static String doRestore(AdbWrapper adbWrapper, CommandLine cl) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private static String doBackup(CommandLine cl) {
-		// TODO Auto-generated method stub
-		return null;
+	private static String doBackup(AdbWrapper adbWrapper, CommandLine cl) throws ParseException {
+		String resultString = "";
+		String backupMode = null;
+		if (!cl.hasOption("img")) {
+			if (cl.hasOption("tar")) {
+				backupMode = "tar";
+			}
+		} else {
+			backupMode = "img";
+		}
+		if (backupMode == null) {
+			throw new ParseException("either img or tar must be set");
+		}
+		String directory = cl.getOptionValue("d", System.getProperty("user.dir"));
+		if ("img".equals(backupMode)) {
+			String[] partitions = cl.getArgs();
+			boolean result = true;
+			for (String partition : partitions) {
+				PartitionInfo partitionInfo = adbWrapper.getCurrentDevice().getPartition(partition);
+				String flashFileName = partitionInfo.flashFileName;
+				if (flashFileName == null || "".equals(flashFileName)) {
+					flashFileName = partitionInfo.partitionName + ".img";
+				}
+				flashFileName = directory + "/" + flashFileName;
+				result |= adbWrapper.getPartitionAsImage(partition, flashFileName);
+				result |= adbWrapper.getPartitionMD5(partition, flashFileName + ".md5");
+				try {
+					boolean compareMD5 = AdbWrapper.compareMD5(flashFileName, flashFileName + ".md5");
+					if (!compareMD5) {
+						resultString += flashFileName + "verification failed\n";
+					}
+				} catch (NoSuchAlgorithmException e) {
+					result = false;
+					break;
+				} catch (IOException e) {
+					result = false;
+					break;
+				}
+			}
+		} else {			
+		}
+		return resultString;
 	}
 
 	/**

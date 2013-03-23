@@ -2391,6 +2391,8 @@ class TestDevice implements IManagedTestDevice {
 
 	@Override
 	public List<PartitionInfo> getPartitionInfo() throws DeviceNotAvailableException {
+		return getPartitionsFromProcCpuinfo();
+/*
 //		executeShellCommand("su -c busybox cat /proc/mtd | busybox egrep \"(mtd|mmc|bml)\"`\" != \"\"");
 		String executeShellCommand = executeShellCommand("su -c busybox cat /proc/fstab | busybox egrep \"(mtd|mmc|bml)\"`\" != \"\"");
 		String executeShellCommand2 = executeShellCommand("su -c busybox cat /etc/fstab");
@@ -2399,6 +2401,7 @@ class TestDevice implements IManagedTestDevice {
 		String executeShellCommand5 = executeShellCommand("su -c busybox cat /proc/partitions");
 		String executeShellCommand6 = executeShellCommand("su -c busybox cat /proc/cpuinfo");
 		return null;
+*/
 	}
 /*	
 	private List<PartitionInfo> getPartitionsFromEtcFstab() throws DeviceNotAvailableException {

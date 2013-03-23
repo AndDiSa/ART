@@ -115,7 +115,7 @@ public interface ITestDevice {
     		grouper.add(new PartitionInfo("ext4", 0, 12288, "SOS", "recovery.img", "/dev/block/mmcblk0p1", null));
     		grouper.add(new PartitionInfo("ext4", 0, 8192, "LNX", "boot.img", "/dev/block/mmcblk0p2", null));
     		grouper.add(new PartitionInfo("ext4", 0, 665600, "APP", "system.img", "/dev/block/mmcblk0p3", "/system"));
-    		grouper.add(new PartitionInfo("ext4", 0, 453632, "CAC", "cache,img", "/dev/block/mmcblk0p4", "/cache"));
+    		grouper.add(new PartitionInfo("ext4", 0, 453632, "CAC", "cache.img", "/dev/block/mmcblk0p4", "/cache"));
     		grouper.add(new PartitionInfo("ext4", 0, 512, "MSC", "misc.img", "/dev/block/mmcblk0p5", null));
     		grouper.add(new PartitionInfo("ext4", 0, 10240, "USP", "bootloader.img", "/dev/block/mmcblk0p6", null));
     		grouper.add(new PartitionInfo("ext4", 0, 5120, "PER", "", "/dev/block/mmcblk0p7", null));
@@ -129,15 +129,15 @@ public interface ITestDevice {
     		List<PartitionInfo> i9100 = new ArrayList<ITestDevice.PartitionInfo>();
     		i9100.add(new PartitionInfo("ext4", 0, 0, "EFS", "efs.img", "/dev/block/mmcblk0p1", "/efs"));
     		i9100.add(new PartitionInfo("ext4", 0, 0, "SBL1", "Sbl.bin", "/dev/block/mmcblk0p2", null));
-    		i9100.add(new PartitionInfo("ext4", 0, 0, "SBL2", "Sbl2.bin", "/dev/block/mmcblk0p3", null)); //TODO: rename flash filename 
+    		i9100.add(new PartitionInfo("ext4", 0, 0, "SBL2", "", "/dev/block/mmcblk0p3", null)); //TODO: rename flash filename 
     		i9100.add(new PartitionInfo("j4fs", 0, 0, "PARAM", "param.lfs", "/dev/block/mmcblk0p4", null));
        		i9100.add(new PartitionInfo("ext4", 0, 0, "KERNEL", "zImage", "/dev/block/mmcblk0p5", null));
-       	 	i9100.add(new PartitionInfo("ext4", 0, 0, "RECOVERY", "recovery.img", "/dev/block/mmcblk0p6", null)); //TODO: rename flash filename 
+       	 	i9100.add(new PartitionInfo("ext4", 0, 0, "RECOVERY", "", "/dev/block/mmcblk0p6", null)); //TODO: rename flash filename 
     		i9100.add(new PartitionInfo("ext4", 0, 0, "CACHE", "cache.img", "/dev/block/mmcblk0p7", "/cache"));
     		i9100.add(new PartitionInfo("ext4", 0, 0, "MODEM", "modem.bin", "/dev/block/mmcblk0p8", null));
     		i9100.add(new PartitionInfo("ext4", 0, 0, "FACTORYFS", "factoryfs.img", "/dev/block/mmcblk0p9", "/system"));
     		i9100.add(new PartitionInfo("ext4", 0, 0, "DATAFS", "data.img", "/dev/block/mmcblk0p10", "/data"));
-    		i9100.add(new PartitionInfo("ext4", 0, 0, "UMS", "userdata.img", "/dev/block/mmcblk0p11", "/sdcard")); //TODO: rename flash filename 
+    		i9100.add(new PartitionInfo("ext4", 0, 0, "UMS", "", "/dev/block/mmcblk0p11", "/sdcard")); //TODO: rename flash filename 
     		i9100.add(new PartitionInfo("ext4", 0, 0, "HIDDEN", "hidden.img", "/dev/block/mmcblk0p12", "/preload"));
     		deviceMap.put("SMDK4210", i9100);
     	}
@@ -161,7 +161,7 @@ public interface ITestDevice {
         /**
          * Convenience constructor to set all members
          */
-        public PartitionInfo(String type, Integer startBlock, Integer blockCount, String partitionName, String deviceName, String flashFileName, String mountPoint) {
+        public PartitionInfo(String type, Integer startBlock, Integer blockCount, String partitionName, String flashFileName, String deviceName, String mountPoint) {
             this.type = type;
             this.startBlock = startBlock;
             this.blockCount = blockCount;
@@ -177,7 +177,7 @@ public interface ITestDevice {
         
         @Override
         public String toString() {
-            return String.format("%s %i %i %s %s %s %s", this.type, this.startBlock, this.blockCount, this.partitionName, this.flashFileName, this.deviceName, this.mountPoint);
+            return String.format("%s %d %d %s %s %s %s", this.type, this.startBlock, this.blockCount, this.partitionName, this.flashFileName, this.deviceName, this.mountPoint);
         }
     }
 
