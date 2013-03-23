@@ -12,9 +12,34 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * 
+ * based on the android tradefederation project
+ * modified by AndDiSa 
  */
 
 package de.anddisa.adb.device;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.CollectingOutputReceiver;
@@ -32,8 +57,8 @@ import com.android.ddmlib.SyncService;
 import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.ITestRunListener;
+
 import de.anddisa.adb.build.IBuildInfo;
-import de.anddisa.adb.device.ITestDevice.PartitionInfo;
 import de.anddisa.adb.device.WifiHelper.WifiState;
 import de.anddisa.adb.log.LogUtil.CLog;
 import de.anddisa.adb.result.ByteArrayInputStreamSource;
@@ -47,29 +72,6 @@ import de.anddisa.adb.util.FileUtil;
 import de.anddisa.adb.util.IRunUtil;
 import de.anddisa.adb.util.RunUtil;
 import de.anddisa.adb.util.StreamUtil;
-
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
 
 /**
  * Default implementation of a {@link ITestDevice}
@@ -2474,7 +2476,7 @@ class TestDevice implements IManagedTestDevice {
 			List<PartitionInfo> pil = getPartitionsFromProcCpuinfo();
 			if (pil != null) {
 				for (PartitionInfo partitionInfo : pil) {
-					if (partition.equals(partitionInfo.name)) {
+					if (partition.equals(partitionInfo.partitionName)) {
 						result = partitionInfo;
 						break;
 					}

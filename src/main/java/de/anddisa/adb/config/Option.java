@@ -12,8 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * 
+ * based on the android tradefederation project
+ * modified by AndDiSa 
  */
-
 package de.anddisa.adb.config;
 
 import java.lang.annotation.ElementType;
