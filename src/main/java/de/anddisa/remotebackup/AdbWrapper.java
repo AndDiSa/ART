@@ -36,7 +36,7 @@ import de.anddisa.adb.device.DeviceSelectionOptions;
 import de.anddisa.adb.device.IDeviceManager;
 import de.anddisa.adb.device.ITestDevice;
 import de.anddisa.adb.device.ITestDevice.MountPointInfo;
-import de.anddisa.adb.device.ITestDevice.PartitionInfo;
+import de.anddisa.adb.device.PartitionInfo;
 /**
  * 
  * This class wraps adb commands to "high level" commands and manages the
@@ -68,6 +68,7 @@ public class AdbWrapper {
 			} catch (FileNotFoundException e) {
 				isCancelled = true;
 			}
+			System.err.print("transferring file:" + fileName);
 		}
 		
 		public void addOutput(byte[] data, int offset, int length) {
@@ -75,10 +76,7 @@ public class AdbWrapper {
 				fos.write(data, offset, length);
 				size += length;
 				block++;
-				// some debugging (TODO: remove)
-				if (length != 4096) {
-					System.out.println("block:" + block + " size:" + length);
-				}
+				System.err.print(".");
 			} catch (IOException e) {
 				isCancelled = true;
 			}
@@ -87,8 +85,8 @@ public class AdbWrapper {
 		public void flush() {
 			try {
 				fos.flush();
-				System.out.println("blocks:" + block);
-				System.out.println("size:" + size);
+				System.err.println("finished");
+				System.err.println("size:" + size);
 				fos.close();
 			} catch (IOException e) {
 				isCancelled = true;

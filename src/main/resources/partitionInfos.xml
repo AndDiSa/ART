@@ -1,0 +1,44 @@
+<map>
+  <entry>
+    <string>SMDK4210</string>
+    <list>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="EFS" flashFileName="efs.img" deviceName="/dev/block/mmcblk0p1" mountPoint="/efs"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="SBL1" flashFileName="Sbl.bin" deviceName="/dev/block/mmcblk0p2"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="SBL2" flashFileName="" deviceName="/dev/block/mmcblk0p3"/>
+      <PartitionInfo type="j4fs" startBlock="0" blockCount="0" partitionName="PARAM" flashFileName="param.lfs" deviceName="/dev/block/mmcblk0p4"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="KERNEL" flashFileName="zImage" deviceName="/dev/block/mmcblk0p5"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="RECOVERY" flashFileName="" deviceName="/dev/block/mmcblk0p6"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="CACHE" flashFileName="cache.img" deviceName="/dev/block/mmcblk0p7" mountPoint="/cache"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="MODEM" flashFileName="modem.bin" deviceName="/dev/block/mmcblk0p8"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="FACTORYFS" flashFileName="factoryfs.img" deviceName="/dev/block/mmcblk0p9" mountPoint="/system"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="DATAFS" flashFileName="data.img" deviceName="/dev/block/mmcblk0p10" mountPoint="/data"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="UMS" flashFileName="" deviceName="/dev/block/mmcblk0p11" mountPoint="/sdcard"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="HIDDEN" flashFileName="hidden.img" deviceName="/dev/block/mmcblk0p12" mountPoint="/preload"/>
+    </list>
+  </entry>
+  <entry>
+    <string>grouper</string>
+    <list>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="12288" partitionName="SOS" flashFileName="recovery.img" deviceName="/dev/block/mmcblk0p1"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="8192" partitionName="LNX" flashFileName="boot.img" deviceName="/dev/block/mmcblk0p2"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="665600" partitionName="APP" flashFileName="system.img" deviceName="/dev/block/mmcblk0p3" mountPoint="/system"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="453632" partitionName="CAC" flashFileName="cache.img" deviceName="/dev/block/mmcblk0p4" mountPoint="/cache"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="512" partitionName="MSC" flashFileName="misc.img" deviceName="/dev/block/mmcblk0p5"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="10240" partitionName="USP" flashFileName="bootloader.img" deviceName="/dev/block/mmcblk0p6"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="5120" partitionName="PER" flashFileName="" deviceName="/dev/block/mmcblk0p7"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="512" partitionName="MDA" flashFileName="" deviceName="/dev/block/mmcblk0p8"/>
+      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="UDA" flashFileName="userdata.img" deviceName="/dev/block/mmcblk0p9" mountPoint="/data"/>
+    </list>
+  </entry>
+  <entry>
+    <string>trout</string>
+    <list>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="misc" flashFileName="misc.img" deviceName="/dev/mtd/mtd0ro"/>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="recovery" flashFileName="recovery.img" deviceName="/dev/mtd/mtd1ro"/>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="boot" flashFileName="boot.img" deviceName="/dev/mtd/mtd2ro"/>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="system" flashFileName="system.img" deviceName="/dev/mtd/mtd3ro" mountPoint="/system"/>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="cache" flashFileName="cache.img" deviceName="/dev/mtd/mtd4ro" mountPoint="/cache"/>
+      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="userdata" flashFileName="userdata.img" deviceName="/dev/mtd/mtd5ro" mountPoint="/data"/>
+    </list>
+  </entry>
+</map>

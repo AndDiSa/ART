@@ -25,7 +25,7 @@ import de.anddisa.adb.device.DeviceNotAvailableException;
 import de.anddisa.adb.device.IDeviceManager;
 import de.anddisa.adb.device.ITestDevice;
 import de.anddisa.adb.device.ITestDevice.MountPointInfo;
-import de.anddisa.adb.device.ITestDevice.PartitionInfo;
+import de.anddisa.adb.device.PartitionInfo;
 import de.anddisa.adb.device.TestDeviceState;
 import de.anddisa.adb.util.CommandResult;
 

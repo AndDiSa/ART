@@ -16,7 +16,7 @@ package de.anddisa.remotebackup;
 
 import java.util.List;
 
-import de.anddisa.adb.device.ITestDevice.PartitionInfo;
+import de.anddisa.adb.device.PartitionInfo;
 
 public class BackupProperties {
 

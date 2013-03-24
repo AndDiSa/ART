@@ -14,9 +14,13 @@
  */
 package de.anddisa.remotebackup;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -30,7 +34,7 @@ import org.apache.commons.cli.ParseException;
 
 import de.anddisa.adb.device.DeviceNotAvailableException;
 import de.anddisa.adb.device.ITestDevice;
-import de.anddisa.adb.device.ITestDevice.PartitionInfo;
+import de.anddisa.adb.device.PartitionInfo;
 
 public class RemoteBackup {
 
@@ -39,80 +43,90 @@ public class RemoteBackup {
         final Options options = new Options();
         OptionGroup commands = new OptionGroup();
         commands.addOption(OptionBuilder
-				.withLongOpt("backup")
 				.withDescription("backup partion(s)")
 				.create("backup"));
 		commands.addOption(OptionBuilder
-				.withLongOpt("restore")
 				.withDescription("restore partition(s)")
 				.create("restore"));
 		commands.addOption(OptionBuilder
-				.withLongOpt("devices")
 				.withDescription("list available devices")
 				.create("devices"));
 		commands.addOption(OptionBuilder
-				.withLongOpt("info")
-				.withDescription("info for devices")
+				.withDescription("dump device info")
 				.create("info"));
 		commands.addOption(OptionBuilder
 				.withLongOpt("help")
 				.withDescription("print help")
-				.create("help"));
+				.create("h"));
         options.addOptionGroup(commands);
         OptionGroup mode = new OptionGroup();
         mode.addOption(OptionBuilder
-				.withLongOpt("img")
-				.withDescription("image mode")
-				.create("img"));
+				.withLongOpt("image")
+				.withDescription("use image mode")
+				.create("i"));
 		mode.addOption(OptionBuilder
 				.withLongOpt("tar")
-				.withDescription("tar mode")
-				.create("tar"));
+				.withDescription("use tar mode")
+				.create("t"));
         options.addOptionGroup(mode);
         OptionGroup location = new OptionGroup();
         location.addOption(OptionBuilder
-				.withLongOpt("d")
-				.withDescription("directory")
+				.withLongOpt("baseDir")
+				.withDescription("base directory to backup to / restore from")
 				.hasArg()
-				.create("d"));
+				.create("bd"));
         location.addOption(OptionBuilder
-				.withLongOpt("f")
-				.withDescription("file")
+				.withLongOpt("file")
+				.withDescription("file to restore from")
 				.hasArg()
 				.create("f"));
         options.addOptionGroup(location);
         options.addOption(OptionBuilder
         		.withLongOpt("serial")
-        		.withDescription("serial number")
+        		.withDescription("connect tot device with serial number")
         		.isRequired(false)
         		.hasArg()
-        		.create("serial"));
+        		.create("s"));
         options.addOption(OptionBuilder
-        		.withLongOpt("t")
-        		.withDescription("timestamp")
+        		.withLongOpt("timeStampFormat")
+        		.withDescription("create timestamped sub directory in backup mode using format (e.g. 'YYYY-MM-DD-HH-mm'")
         		.isRequired(false)
         		.hasArg()
-        		.create("t"));
+        		.create("tsf"));
         options.addOption(OptionBuilder
         		.withLongOpt("tooldir")
-        		.withDescription("tooldir path")
+        		.withDescription("defined tooldir path")
         		.isRequired(false)
         		.hasArg()
-        		.create("tooldir"));
+        		.create("td"));
+        options.addOption(OptionBuilder
+        		.withLongOpt("partitionInfoFile")
+        		.withDescription("partitionInfoFile to be used for initialization")
+        		.isRequired(false)
+        		.hasArg()
+        		.create("pif"));
         return options;
     }
 
-    private static String outputCommandLineHelp(final Options options) {
+    private static String outputCommandLineHelp(final String message, final Options options) {
         final HelpFormatter formater = new HelpFormatter();
-        formater.printHelp("Android Remote Tools:", options);
+        formater.printHelp("art", "", options, message);
         return "";
     }
 
-    private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException, ParseException {
-    	String adb = cl.getOptionValue("adb", null);
+    private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException, ParseException, ApplicationException {
+    	String adb = cl.getOptionValue("td", null);
 		AdbWrapper adbWrapper = new AdbWrapper(adb);
-		String serial = cl.getOptionValue("serial", null);
+		String serial = cl.getOptionValue("s", null);
 		adbWrapper.selectDevice(serial);
+		String pif = cl.getOptionValue("pif", null);
+		if (pif != null) {
+			try {
+				PartitionInfo.init(pif);
+			} catch (Exception e) {
+				throw new ApplicationException(e.getMessage());
+			}
+		}
         if ((null != cl) && cl.hasOption("devices")) {
             // do something with devices
         	return doDevices(adbWrapper, cl);
@@ -127,7 +141,7 @@ public class RemoteBackup {
             // do something with devices
         	return doInfo(adbWrapper, cl);
         }
-        return outputCommandLineHelp(options);
+        return outputCommandLineHelp("", options);
     }
 
 	private static String doDevices(AdbWrapper adbWrapper, CommandLine cl) {
@@ -170,48 +184,63 @@ public class RemoteBackup {
 		return sb.toString();
 	}
 
-	private static String doRestore(AdbWrapper adbWrapper, CommandLine cl) {
-		// TODO Auto-generated method stub
-		return null;
+	private static String doRestore(AdbWrapper adbWrapper, CommandLine cl)  throws ApplicationException {
+		throw new ApplicationException("not implemented yet");
 	}
 
-	private static String doBackup(AdbWrapper adbWrapper, CommandLine cl) throws ParseException {
+	private static String doBackup(AdbWrapper adbWrapper, CommandLine cl) throws ApplicationException {
 		String resultString = "";
 		String backupMode = null;
-		if (!cl.hasOption("img")) {
-			if (cl.hasOption("tar")) {
+		if (!cl.hasOption("i")) {
+			if (cl.hasOption("t")) {
 				backupMode = "tar";
 			}
 		} else {
 			backupMode = "img";
 		}
 		if (backupMode == null) {
-			throw new ParseException("either img or tar must be set");
+			throw new ApplicationException("either -i or -t must be set");
 		}
-		String directory = cl.getOptionValue("d", System.getProperty("user.dir"));
+		String subDir = "";
+		if (cl.hasOption("tsf")) {
+			DateFormat df = new SimpleDateFormat(cl.getOptionValue("tsf"));
+			subDir = df.format(new Date());
+		}
+		String directory = cl.getOptionValue("bd", System.getProperty("user.dir"));
 		if ("img".equals(backupMode)) {
 			String[] partitions = cl.getArgs();
 			boolean result = true;
 			for (String partition : partitions) {
 				PartitionInfo partitionInfo = adbWrapper.getCurrentDevice().getPartition(partition);
-				String flashFileName = partitionInfo.flashFileName;
-				if (flashFileName == null || "".equals(flashFileName)) {
-					flashFileName = partitionInfo.partitionName + ".img";
-				}
-				flashFileName = directory + "/" + flashFileName;
-				result |= adbWrapper.getPartitionAsImage(partition, flashFileName);
-				result |= adbWrapper.getPartitionMD5(partition, flashFileName + ".md5");
-				try {
-					boolean compareMD5 = AdbWrapper.compareMD5(flashFileName, flashFileName + ".md5");
-					if (!compareMD5) {
-						resultString += flashFileName + "verification failed\n";
+				if (partitionInfo != null) {
+					String flashFileName = partitionInfo.flashFileName;
+					if (flashFileName == null || "".equals(flashFileName)) {
+						flashFileName = partitionInfo.partitionName + ".img";
 					}
-				} catch (NoSuchAlgorithmException e) {
-					result = false;
-					break;
-				} catch (IOException e) {
-					result = false;
-					break;
+					String flashDir = directory + ("".equals(subDir) ? "" : "/" + subDir );
+					File f = new File(flashDir);
+					if (!f.exists()) {
+						if (!f.mkdirs()) {
+							throw new ApplicationException("cannot create directory: " + flashDir);							
+						}
+					}
+					flashFileName = flashDir + "/" + flashFileName;
+					result |= adbWrapper.getPartitionAsImage(partition, flashFileName);
+					result |= adbWrapper.getPartitionMD5(partition, flashFileName + ".md5");
+					try {
+						boolean compareMD5 = AdbWrapper.compareMD5(flashFileName, flashFileName + ".md5");
+						if (!compareMD5) {
+							resultString += flashFileName + "verification failed\n";
+						}
+					} catch (NoSuchAlgorithmException e) {
+						result = false;
+						break;
+					} catch (IOException e) {
+						result = false;
+						break;
+					}
+				} else {
+					throw new ApplicationException("unknown partition name for device: " + partition);
 				}
 			}
 		} else {			
@@ -222,8 +251,13 @@ public class RemoteBackup {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {	
-		handleCommandLine(args);
+	public static void main(String[] args) {
+		try {
+			handleCommandLine(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 
 	public static void handleCommandLine(String[] args) {
@@ -233,7 +267,9 @@ public class RemoteBackup {
 			CommandLine cmd = parser.parse(commandLineOptions, args);
 			System.out.println(processCommandline(cmd, commandLineOptions));
 		} catch (ParseException e) {
-            outputCommandLineHelp(commandLineOptions);
+            outputCommandLineHelp(e.getMessage(), commandLineOptions);
+		} catch (ApplicationException e) {
+	        outputCommandLineHelp(e.getMessage(), commandLineOptions);
 		}
 	}
 }
