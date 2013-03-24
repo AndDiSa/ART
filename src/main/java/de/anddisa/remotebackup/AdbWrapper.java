@@ -199,7 +199,9 @@ public class AdbWrapper {
 		} else {
 			adbLocation = "adb"; //$NON-NLS-1$
 		}
-		deviceManager.init(adbLocation);
+		synchronized (deviceManager) {
+			deviceManager.init(adbLocation);			
+		}
 	}
 
 	/**
@@ -207,7 +209,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Collection}
 	 */
-	public Collection<String> getDevices() {
+	public synchronized  Collection<String> getDevices() {
 		return deviceManager.getAvailableDevices();
 	}
 
@@ -225,7 +227,7 @@ public class AdbWrapper {
 	 * 
 	 * @param deviceId {@link String}
 	 */
-	public void selectDevice(String deviceId) {
+	public synchronized  void selectDevice(String deviceId) {
 		if (deviceId != null) {
 			DeviceSelectionOptions dso = new DeviceSelectionOptions();
 			dso.addSerial(deviceId);

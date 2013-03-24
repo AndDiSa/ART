@@ -143,31 +143,36 @@ public class RemoteBackup {
     private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException, ParseException, ApplicationException {
     	String adb = cl.getOptionValue("td", null);
 		AdbWrapper adbWrapper = new AdbWrapper(adb);
-		String serial = cl.getOptionValue("s", null);
-		adbWrapper.selectDevice(serial);
-		String pif = cl.getOptionValue("pif", null);
-		if (pif != null) {
-			try {
-				PartitionInfo.init(pif);
-			} catch (Exception e) {
-				throw new ApplicationException(e.getMessage());
-			}
-		}
         if ((null != cl) && cl.hasOption("devices")) {
             // do something with devices
         	return doDevices(adbWrapper, cl);
         }
-        if ((null != cl) && cl.hasOption("backup")) {
-        	return doBackup(adbWrapper, cl);
-        }
-        if ((null != cl) && cl.hasOption("restore")) {
-        	return doRestore(adbWrapper, cl);
-        }
-        if ((null != cl) && cl.hasOption("info")) {
-            // do something with devices
-        	return doInfo(adbWrapper, cl);
-        }
-        return outputCommandLineHelp("", options);
+        if (adbWrapper.getDevices().size() > 0) {
+        	String serial = cl.getOptionValue("s", null);
+			adbWrapper.selectDevice(serial);
+			String pif = cl.getOptionValue("pif", null);
+			if (pif != null) {
+				try {
+					PartitionInfo.init(pif);
+				} catch (Exception e) {
+					throw new ApplicationException(e.getMessage());
+				}
+			}
+
+	        if ((null != cl) && cl.hasOption("backup")) {
+	        	return doBackup(adbWrapper, cl);
+	        }
+	        if ((null != cl) && cl.hasOption("restore")) {
+	        	return doRestore(adbWrapper, cl);
+	        }
+	        if ((null != cl) && cl.hasOption("info")) {
+	            // do something with devices
+	        	return doInfo(adbWrapper, cl);
+	        }
+	        return outputCommandLineHelp("", options);			
+		} else {
+			throw new ApplicationException("error: no device found");			
+		}
     }
 
     /**

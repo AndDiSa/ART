@@ -89,7 +89,7 @@ public class DeviceManager implements IDeviceManager {
     /** the maximum number of no device runs that can be allocated at one time */
     private int mNumNullDevicesSupported = 1;
 
-    private boolean mSynchronousMode = false;
+    private boolean mSynchronousMode = true;
 
     /**
      * Package-private constructor, should only be used by this class and its associated unit test.
@@ -141,14 +141,18 @@ public class DeviceManager implements IDeviceManager {
         // don't start adding devices until fastboot support has been established
         // TODO: Temporarily increase default timeout as workaround for syncFiles timeouts
         DdmPreferences.setTimeOut(30*1000);
-        mAdbBridge = createAdbBridge();
         mManagedDeviceListener = new ManagedDeviceListener();
+        mAdbBridge = createAdbBridge();
         // It's important to add the listener before initializing the ADB bridge to avoid a race
         // condition when detecting devices.
         mAdbBridge.addDeviceChangeListener(mManagedDeviceListener);
         mAdbBridge.init(false /* client support */, pathToAdb);
         addEmulators();
         addNullDevices();
+        try {
+			wait(1000);
+		} catch (InterruptedException e) {
+		}
     }
 
     /**

@@ -1,0 +1,17 @@
+    _    ____ _____ 
+   / \  |  _ \_   _|
+  / _ \ | |_) || |  
+ / ___ \|  _ < | |  
+/_/   \_\_| \_\|_|  
+                   
+
+(AndDiSa | Android | Adb) Remote Toolkit
+
+is a toolkit which helps to manage Android devices remotely, i.e. from your PC.
+The toolkit is written using the Java language, i.e. it's running not depending on
+a specific operating system as long there is a Java runtime environment available.
+
+Currently only a command line version of ART is available, i.e. there is no gui.
+
+Usage:
+Cuee  
