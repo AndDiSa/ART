@@ -97,7 +97,7 @@ public class RemoteBackup {
         		.create("s"));
         options.addOption(OptionBuilder
         		.withLongOpt("timeStampFormat")
-        		.withDescription("create timestamped sub directory in backup mode using format (e.g. 'YYYY-MM-DD-HH-mm'")
+        		.withDescription("create timestamped sub directory in backup mode using format (e.g. 'yyyy-MM-dd-hh-mm'")
         		.isRequired(false)
         		.hasArg()
         		.create("tsf"));

@@ -11,7 +11,68 @@ is a toolkit which helps to manage Android devices remotely, i.e. from your PC.
 The toolkit is written using the Java language, i.e. it's running not depending on
 a specific operating system as long there is a Java runtime environment available.
 
-Currently only a command line version of ART is available, i.e. there is no gui.
+Currently only a command line version of ART is available, i.e. there is no gui yet :-(.
 
-Usage:
-Cuee  
+There are several application modes available:
+==============================================
+-backup
+	back up parts / all of your android device
+	
+-devices
+	prints list of available devices
+	
+-info
+	prints detailed info about connected device
+	
+-restore
+ 	restores a backup to device (currently not implemented)
+
+
+Beside the application modes, there are some options which influence the behaviour
+-bd,--baseDir <arg>
+	defines the base directory to backup to / restore from
+	(default is current directory)
+
+-h,--help
+	print help overview
+	
+-i,--image
+	use image mode for backup / restore
+
+-pif,--partitionInfoFile <arg>
+	provide a partition information file which is used for identifying the parttions / file systems
+
+-s,--serial <arg>
+	connect to the device with serial number
+	
+-t,--tar
+	use tar mode for backup / restore
+	
+-td,--tooldir <arg>
+	define path to tools directory where adb / fastboot are located
+	(if not provided, adb and fastboot must be in the users path)
+
+-tsf,--timeStampFormat <arg>
+	create a timestamped sub directory in backup mode using format (e.g. 'yyyy-MM-dd-hh-mm')
+
+Examples:
+=========
+
+List connected devices
+
+	$ art.sh -devices
+	connected devices:
+	123ee2274abc11
+
+Backup recovery partition of device as an image
+
+	$ art.sh -backup -i -td /export/toolsdir/ -bd /backups -tsf yyyy-MM-dd-hh-mm RECOVERY
+	transferring /backups/2013-03-20-20-00/RECOVERY.img...................finished
+	size: 8193939 
+	transferring /backups/2013-03-20-20-00/RECOVERY.img.md5.finished
+	size:37
+
+	btw.: a md5 verification takes place!
+
+...
+ 
