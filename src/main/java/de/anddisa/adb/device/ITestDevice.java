@@ -20,23 +20,21 @@
 
 package de.anddisa.adb.device;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
 import com.android.ddmlib.testrunner.ITestRunListener;
+
 import de.anddisa.adb.build.IBuildInfo;
 import de.anddisa.adb.result.InputStreamSource;
 import de.anddisa.adb.util.CommandResult;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Provides an reliable and slightly higher level API to a ddmlib {@link IDevice}.
@@ -95,13 +93,14 @@ public interface ITestDevice {
             return String.format("%s %s %s %s", this.filesystem, this.mountpoint, this.type, this.options);
         }
     }
-
+/*
     public PartitionInfo getSystemPartition();
     public PartitionInfo getDataPartition();
     public PartitionInfo getCachePartition();
     public PartitionInfo getMiscPartition();
     public PartitionInfo getBootPartition();
     public PartitionInfo getRecoveryPartition();
+*/
     public PartitionInfo getPartition(String partitionName);
     
     /**

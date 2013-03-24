@@ -35,9 +35,17 @@ import org.apache.commons.cli.ParseException;
 import de.anddisa.adb.device.DeviceNotAvailableException;
 import de.anddisa.adb.device.ITestDevice;
 import de.anddisa.adb.device.PartitionInfo;
+import de.anddisa.adb.device.TestDeviceState;
+import de.anddisa.adb.device.ITestDevice.MountPointInfo;
+import de.anddisa.adb.util.CommandResult;
 
 public class RemoteBackup {
 
+	/**
+	 * recognised options
+	 * 
+	 * @return {@link Options}
+	 */
     private static Options createCommandLineOptions() {
     	
         final Options options = new Options();
@@ -108,12 +116,30 @@ public class RemoteBackup {
         return options;
     }
 
+    /**
+     * prints help message
+     * 
+     * @param message
+     * @param options
+     * @return 
+     */
     private static String outputCommandLineHelp(final String message, final Options options) {
         final HelpFormatter formater = new HelpFormatter();
         formater.printHelp("art", "", options, message);
         return "";
     }
 
+    /**
+     * processes the command line input
+     * 
+     * @param cl
+     * @param options
+     * @return
+     * 
+     * @throws IllegalArgumentException
+     * @throws ParseException
+     * @throws ApplicationException
+     */
     private static String processCommandline(final CommandLine cl, final Options options) throws IllegalArgumentException, ParseException, ApplicationException {
     	String adb = cl.getOptionValue("td", null);
 		AdbWrapper adbWrapper = new AdbWrapper(adb);
@@ -131,7 +157,7 @@ public class RemoteBackup {
             // do something with devices
         	return doDevices(adbWrapper, cl);
         }
-       if ((null != cl) && cl.hasOption("backup")) {
+        if ((null != cl) && cl.hasOption("backup")) {
         	return doBackup(adbWrapper, cl);
         }
         if ((null != cl) && cl.hasOption("restore")) {
@@ -144,6 +170,13 @@ public class RemoteBackup {
         return outputCommandLineHelp("", options);
     }
 
+    /**
+     * devices command
+     * 
+     * @param adbWrapper
+     * @param cl
+     * @return
+     */
 	private static String doDevices(AdbWrapper adbWrapper, CommandLine cl) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("connected devices:");
@@ -156,21 +189,46 @@ public class RemoteBackup {
 		return sb.toString();
 	}
 
+	/**
+	 * info command
+	 * 
+	 * @param adbWrapper
+	 * @param cl
+	 * @return
+	 */
 	private static String doInfo(AdbWrapper adbWrapper, CommandLine cl) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("Partitions:");
-		sb.append('\n');
-		sb.append("Type StartBlock BlockCount PartitionName FlashFileName DeviceName mountPoint");
-		sb.append('\n');
-		sb.append("----------------------------------------------------------------------------");
-		sb.append('\n');
 		try {
 			ITestDevice currentDevice = adbWrapper.getCurrentDevice();
 			if (currentDevice != null) {
+				sb.append("Partitions:");
+				sb.append('\n');
+				sb.append("Type StartBlock BlockCount PartitionName FlashFileName DeviceName mountPoint");
+				sb.append('\n');
+				sb.append("----------------------------------------------------------------------------");
+				sb.append('\n');
 				List<PartitionInfo> partitionInfos = currentDevice.getPartitionInfo();
 				for (PartitionInfo partitionInfo : partitionInfos) {
 					sb.append(partitionInfo.toString());
 					sb.append('\n');
+				}
+
+				if (currentDevice.getDeviceState().compareTo(TestDeviceState.FASTBOOT) == 0) {
+					System.out.println("Bootloader version:" + currentDevice.getBootloaderVersion());
+					System.out.println("Product type:" + currentDevice.getFastbootProductType());
+					System.out.println("Product variant:" + currentDevice.getFastbootProductVariant());
+					CommandResult commandResult = currentDevice.executeFastbootCommand("getvar", "all");
+					System.out.println("result.status:" + commandResult.getStatus());
+					System.out.println("result.stderr:" +commandResult.getStderr());
+					System.out.println("result.stdout:" +commandResult.getStdout());
+				} else {
+					System.out.println("Product type:" + currentDevice.getProductType());
+					System.out.println("Product variant:" + currentDevice.getProductVariant());
+					System.out.println("Build id:" + currentDevice.getOptions());
+					List<MountPointInfo> mountPointInfo = currentDevice.getMountPointInfo();
+					for (MountPointInfo mpi : mountPointInfo) {
+						System.out.println(mpi.mountpoint + " " + mpi.type + " " + mpi.filesystem + " " + mpi.options);
+					}
 				}
 			} else {
 				sb.append("error: device not available ...");
@@ -184,10 +242,26 @@ public class RemoteBackup {
 		return sb.toString();
 	}
 
+	/**
+	 * restore command
+	 * 
+	 * @param adbWrapper
+	 * @param cl
+	 * @return
+	 * @throws ApplicationException
+	 */
 	private static String doRestore(AdbWrapper adbWrapper, CommandLine cl)  throws ApplicationException {
 		throw new ApplicationException("not implemented yet");
 	}
 
+	/**
+	 * backup command
+	 * 
+	 * @param adbWrapper
+	 * @param cl
+	 * @return
+	 * @throws ApplicationException
+	 */
 	private static String doBackup(AdbWrapper adbWrapper, CommandLine cl) throws ApplicationException {
 		String resultString = "";
 		String backupMode = null;
@@ -243,23 +317,42 @@ public class RemoteBackup {
 					throw new ApplicationException("unknown partition name for device: " + partition);
 				}
 			}
-		} else {			
+			if (!result) {
+				resultString += "error!";
+			}
+		} else {
+			String[] mountPoints = cl.getArgs();
+			boolean result = true;
+			for (String mountPoint : mountPoints) {
+				String flashDir = directory + ("".equals(subDir) ? "" : "/" + subDir );
+				File f = new File(flashDir);
+				if (!f.exists()) {
+					if (!f.mkdirs()) {
+						throw new ApplicationException("cannot create directory: " + flashDir);							
+					}
+				}
+				try {
+					result = adbWrapper.getMountPointAsTar(mountPoint, flashDir);
+				} catch (NoSuchAlgorithmException e) {
+					result = false;
+					break;
+				} catch (IOException e) {
+					result = false;
+					break;
+				}
+			}
+			if (!result) {
+				resultString += "error!";
+			}
 		}
 		return resultString;
 	}
 
 	/**
+	 * interprets the command
+	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		try {
-			handleCommandLine(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.exit(0);
-	}
-
 	public static void handleCommandLine(String[] args) {
 		CommandLineParser parser = new GnuParser();
 		Options commandLineOptions = createCommandLineOptions();
@@ -271,5 +364,19 @@ public class RemoteBackup {
 		} catch (ApplicationException e) {
 	        outputCommandLineHelp(e.getMessage(), commandLineOptions);
 		}
+	}
+	
+	/**
+	 * main
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try {
+			handleCommandLine(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
 	}
 }

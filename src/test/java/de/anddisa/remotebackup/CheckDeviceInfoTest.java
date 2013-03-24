@@ -74,12 +74,12 @@ public class CheckDeviceInfoTest {
 				System.out.println("/proc/emmc:" + allocateDevice.executeShellCommand(getRootExecutableCommand("busybox cat /proc/emmc", !allocateDevice.isAdbRoot())));
 				System.out.println("/proc/partitions:" + allocateDevice.executeShellCommand(getRootExecutableCommand("busybox cat /proc/partitions", !allocateDevice.isAdbRoot())));
 				System.out.println("/proc/cpuinfo:" + allocateDevice.executeShellCommand(getRootExecutableCommand("busybox cat /proc/cpuinfo", !allocateDevice.isAdbRoot())));
-				PartitionInfo systemPartition = allocateDevice.getSystemPartition();
-				PartitionInfo dataPartition = allocateDevice.getDataPartition();
-				PartitionInfo cachePartition = allocateDevice.getCachePartition();
-				PartitionInfo miscPartition = allocateDevice.getMiscPartition();
-				PartitionInfo bootPartition = allocateDevice.getBootPartition();
-				PartitionInfo recoveryPartition = allocateDevice.getRecoveryPartition();
+//				PartitionInfo systemPartition = allocateDevice.getSystemPartition();
+//				PartitionInfo dataPartition = allocateDevice.getDataPartition();
+//				PartitionInfo cachePartition = allocateDevice.getCachePartition();
+//				PartitionInfo miscPartition = allocateDevice.getMiscPartition();
+//				PartitionInfo bootPartition = allocateDevice.getBootPartition();
+//				PartitionInfo recoveryPartition = allocateDevice.getRecoveryPartition();
 				System.out.println("/proc/cpuinfo:" + allocateDevice.executeShellCommand(getRootExecutableCommand("busybox cat /proc/cpuinfo", !allocateDevice.isAdbRoot())));
 			}
 		} catch (DeviceNotAvailableException e) {

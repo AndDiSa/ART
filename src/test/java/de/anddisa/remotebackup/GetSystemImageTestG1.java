@@ -30,31 +30,31 @@ public class GetSystemImageTestG1 {
 
 	@Test
 	public void testGetSystemImage() {
-		Assert.assertTrue(adbWrapper.getSystemPartitionAsImage("/tmp/system.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("system", "/tmp/system.img"));
 	}
 
 	@Test
 	public void testGetDataImage() {
-		Assert.assertTrue(adbWrapper.getDataPartitionAsImage("/tmp/data.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("data", "/tmp/data.img"));
 	}
 
 	@Test
 	public void testGetCacheImage() {
-		Assert.assertTrue(adbWrapper.getCachePartitionAsImage("/tmp/cache.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("cache", "/tmp/cache.img"));
 	}
 
 	@Test
 	public void testGetRecoveryImage() {
-		Assert.assertTrue(adbWrapper.getRecoveryPartitionAsImage("/tmp/recovery.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("recovery", "/tmp/recovery.img"));
 	}
 
 	@Test
 	public void testGetBootImage() {
-		Assert.assertTrue(adbWrapper.getBootPartitionAsImage("/tmp/boot.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("boot", "/tmp/boot.img"));
 	}
 
 	//@Test
 	public void testGetMiscImage() {
-		Assert.assertTrue(adbWrapper.getMiscPartitionAsImage("/tmp/misc.img"));
+		Assert.assertTrue(adbWrapper.getPartitionAsImage("misc", "/tmp/misc.img"));
 	}
 }

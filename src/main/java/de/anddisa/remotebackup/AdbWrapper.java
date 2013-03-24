@@ -272,6 +272,28 @@ public class AdbWrapper {
 	// -----------------------------------------------------------------------------
 	// methods related to tar
 	// -----------------------------------------------------------------------------
+	/**
+	 * gets the content of the file system as tar file
+	 * 
+	 * @param mountPoint {@link String} file system to be tared
+	 * @param toFilePath {@link String} where the file shall be stored locally
+	 * 
+	 * @return {@link Boolean} true if the transfer succeeded, false otherwise
+	 * 
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 */
+	public boolean getMountPointAsTar(String mountPoint, String toFilePath) throws NoSuchAlgorithmException, IOException {
+		final String MP_TAR = (mountPoint.startsWith("/") ? "" : "/") + mountPoint + ".tar";
+		final String MP_TAR_MD5 = MP_TAR + ".md5";
+		
+		boolean result = true;
+		
+		result &= getFileSystemAsTar(toFilePath, (mountPoint.startsWith("/") ? "" : "/") + mountPoint, mountPoint);
+		result &= getTarFileMD5((mountPoint.startsWith("/") ? "" : "/") + mountPoint, toFilePath + MP_TAR_MD5);
+		result &= AdbWrapper.compareMD5(toFilePath + "/" + MP_TAR, toFilePath + MP_TAR_MD5);
+		return result;
+	}
 	
 	/**
 	 * gets the content of the system partition as tar file
@@ -284,16 +306,7 @@ public class AdbWrapper {
 	 * @throws IOException
 	 */
 	public boolean getSytemPartitionAsTar(String toFilePath) throws NoSuchAlgorithmException, IOException {
-		final String SYSTEM = "system";
-		final String SYSTEM_TAR = SYSTEM + ".tar";
-		final String SYSTEM_TAR_MD5 = SYSTEM_TAR + ".md5";
-		
-		boolean result = true;
-		
-		result &= getFileSystemAsTar(toFilePath, "/" + SYSTEM, SYSTEM);
-		result &= getTarFileMD5("/" + SYSTEM, toFilePath + "/" + SYSTEM_TAR_MD5);
-		result &= AdbWrapper.compareMD5(toFilePath + "/" + SYSTEM_TAR, toFilePath + "/" + SYSTEM_TAR_MD5);
-		return result;
+		return getMountPointAsTar("system", toFilePath);
 	}
 
 	/**
@@ -310,17 +323,7 @@ public class AdbWrapper {
 	 * 		(obviously, but how to handle ...) 
 	 */
 	public boolean getDataPartitionAsTar(String toFilePath) throws NoSuchAlgorithmException, IOException {
-		final String DATA = "data";
-		final String DATA_TAR = DATA + ".tar";
-		final String DATA_TAR_MD5 = DATA_TAR + ".md5";
-
-		boolean result = true;
-		
-		result &= getFileSystemAsTar(toFilePath, "/" + DATA, DATA);
-		result &= getTarFileMD5("/" + DATA, toFilePath + "/" + DATA_TAR_MD5);
-		result &= AdbWrapper.compareMD5(toFilePath + "/" + DATA_TAR, toFilePath + "/" + DATA_TAR_MD5);
-
-		return result;
+		return getMountPointAsTar("data", toFilePath);
 	}
 
 	/**
@@ -337,17 +340,7 @@ public class AdbWrapper {
 	 * 		(obviously, but how to handle ...) 
 	 */
 	public boolean getExtPartitionAsTar(String toFilePath) throws NoSuchAlgorithmException, IOException {
-		final String SD_EXT = "sd-ext";
-		final String SD_EXT_TAR = SD_EXT + ".tar";
-		final String SD_EXT_TAR_MD5 = SD_EXT_TAR + ".md5";
-
-		boolean result = true;
-		
-		result &= getFileSystemAsTar(toFilePath, "/" + SD_EXT, SD_EXT);
-		result &= getTarFileMD5("/" + SD_EXT, toFilePath + "/" + SD_EXT_TAR_MD5);
-		result &= AdbWrapper.compareMD5(toFilePath + "/" + SD_EXT_TAR, toFilePath + "/" + SD_EXT_TAR_MD5);
-
-		return result;
+		return getMountPointAsTar("sd-ext", toFilePath);
 	}
 
 	/**
@@ -364,17 +357,7 @@ public class AdbWrapper {
 	 * 		(obviously, but how to handle ...) 
 	 */
 	public boolean getSdcardPartitionAsTar(String toFilePath) throws NoSuchAlgorithmException, IOException {
-		final String SDCARD = "sdcard";
-		final String SDCARD_TAR = SDCARD + ".tar";
-		final String SDCARD_TAR_MD5 = SDCARD_TAR + ".md5";
-
-		boolean result = true;
-		
-		result &= getFileSystemAsTar(toFilePath, "/" + SDCARD, SDCARD);
-		result &= getTarFileMD5("/" + SDCARD, toFilePath + "/" + SDCARD_TAR_MD5);
-		result &= AdbWrapper.compareMD5(toFilePath + "/" + SDCARD_TAR, toFilePath + "/" + SDCARD_TAR_MD5);
-
-		return result;
+		return getMountPointAsTar("sdcard", toFilePath);
 	}
 
 	/**
@@ -417,7 +400,7 @@ public class AdbWrapper {
 			}
 		};
 		
-		final FileReceiver tarFileReceiver = new FileReceiver(toFilePath + "/" + tarFileName + ".tar");
+		final FileReceiver tarFileReceiver = new FileReceiver(toFilePath + (tarFileName.startsWith("/") ? "" : "/") + tarFileName + ".tar");
 		
 		//
 		// run the cat command
@@ -467,7 +450,7 @@ public class AdbWrapper {
 	private boolean getTarFileMD5(String rootFileName, String md5FileName) {
 		boolean result = true;
 
-		final String md5sumString = "busybox tar cf - " + rootFileName + " | md5sum";
+		final String md5sumString = "busybox tar cf - " + rootFileName + " 2&>/dev/null | md5sum";
 
 		try {
 			selectedDevice.executeShellCommand(getRootExecutableCommand(md5sumString), new FileReceiver(md5FileName));
@@ -484,6 +467,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getSystemPartitionAsImage(String imageFileName) {
 		PartitionInfo systemPartition = selectedDevice.getSystemPartition();
 		if (systemPartition != null && systemPartition.deviceName != null && !"".equals(systemPartition.deviceName)) {
@@ -492,7 +476,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the data partition as an image from remote
 	 * 
@@ -500,6 +484,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getDataPartitionAsImage(String imageFileName) {
 		PartitionInfo dataPartition = selectedDevice.getDataPartition();
 		if (dataPartition != null && dataPartition.deviceName != null && !"".equals(dataPartition.deviceName)) {
@@ -508,7 +493,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the cache partition as an image from remote
 	 * 
@@ -516,6 +501,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getCachePartitionAsImage(String imageFileName) {
 		PartitionInfo cachePartition = selectedDevice.getCachePartition();
 		if (cachePartition != null && cachePartition.deviceName != null && !"".equals(cachePartition.deviceName)) {
@@ -524,7 +510,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the boot partition as an image from remote
 	 * 
@@ -532,6 +518,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getBootPartitionAsImage(String imageFileName) {
 		PartitionInfo bootPartition = selectedDevice.getBootPartition();
 		if (bootPartition != null && bootPartition.deviceName != null && !"".equals(bootPartition.deviceName)) {
@@ -540,7 +527,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the recovery partition as an image from remote
 	 * 
@@ -548,6 +535,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getRecoveryPartitionAsImage(String imageFileName) {
 		PartitionInfo recoveryPartition = selectedDevice.getRecoveryPartition();
 		if (recoveryPartition != null && recoveryPartition.deviceName != null && !"".equals(recoveryPartition.deviceName)) {
@@ -556,7 +544,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the misc partition as an image from remote
 	 * 
@@ -564,6 +552,7 @@ public class AdbWrapper {
 	 * 
 	 * @return {@link Boolean} true if succeeded, false otherwise
 	 */
+/*
 	public boolean getMiscPartitionAsImage(String imageFileName) {
 		PartitionInfo miscPartition = selectedDevice.getMiscPartition();
 		if (miscPartition != null && miscPartition.deviceName != null && !"".equals(miscPartition.deviceName)) {
@@ -572,7 +561,7 @@ public class AdbWrapper {
 			return false;
 		}
 	}
-
+*/
 	/**
 	 * gets the partition with the given name as an image from remote
 	 * 

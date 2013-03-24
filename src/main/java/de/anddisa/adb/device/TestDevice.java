@@ -2491,7 +2491,7 @@ class TestDevice implements IManagedTestDevice {
 		}	
 		return result;
 	}
-
+/*
 	@Override
 	public PartitionInfo getSystemPartition() {
 		return getPartition("system");
@@ -2521,7 +2521,7 @@ class TestDevice implements IManagedTestDevice {
 	public PartitionInfo getRecoveryPartition() {
 		return getPartition("recovery");
 	}
-
+*/
 	private String getRootExecutableCommand(String command, boolean suWrapperNeeded) {
 		if (suWrapperNeeded) {
 			return "su -c \"" + command + "\"";
