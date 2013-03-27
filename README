@@ -7,72 +7,211 @@
 
 (AndDiSa | Android | Adb) Remote Toolkit
 
-is a toolkit which helps to manage Android devices remotely, i.e. from your PC.
-The toolkit is written using the Java language, i.e. it's running not depending on
-a specific operating system as long there is a Java runtime environment available.
+Version 0.1 alpha / 26.03.2013
 
+
+ART is a toolkit which helps to manage Android devices remotely, i.e. directly from your PC.
+Currently the features implemented concentrate on remote backup the android device, i.e. there
+are possibilities to backup whole partitions of the device or you can get the content of the
+file system(s) as tar file. Other features can/will be added step by step.
+
+There are some preconditions to use the application:
+- you need to have a fully working adb environment, i.e.
+  - you have installed the lastest drivers and binaries
+  - usb debugging is switched on on your device
+  - the device is recognized by adb when connected to your pc and running adb devices
+  - you have given the permissions to your pc to access your device (Android > 4.2)
+- your device needs to be rooted(!)
+- you need to have busybox installed on your device
+
+As the toolkit is written using the Java language it's not limited to run on a specific
+operating system, but on every system where there is a Java runtime environment and
+adb binaries available. I am developing and testing the application on a Linux system,
+from time to time I test it on Windows XP, too. Feedback whether ART is working on other
+environments / OS or not are welcome ... ;-)
+ 
 Currently only a command line version of ART is available, i.e. there is no gui yet :-(.
+Probably later on there will be a GUI, too, but do not expect one within the next time.
+ 
+The sources can be found on my GitHub account: https://github.com/AndDiSa/ART
+here you can also post issues and/or feature requests.
 
-There are several application modes available:
-==============================================
--backup
-	back up parts / all of your android device
+Ok, now it's time to describe the functionality of the tool a bit more deeply.
+
+
+1) There are several application modes available. Switching between the different modes
+takes place by passing one of the following options to the command line:
+
+	-backup
+		back up parts / all of your android device
+		
+	-devices
+		prints a list of available devices
+		
+	-info
+		prints detailed information about the connected device
+		
+	-restore
+	 	restores a backup to device (currently not implemented)
+
+
+2) Beside the application modes, there are some options which influence the behaviour
+of the different modes / adapts the application to the current environment 
+
+	-bd,--baseDir <arg>
+		defines the base directory to backup to / restore from
+		(default is the current directory)
 	
--devices
-	prints list of available devices
+	-h,--help
+		print help overview
+		
+	-i,--image
+		use image mode for backup / restore
 	
--info
-	prints detailed info about connected device
+	-pif,--partitionInfoFile <arg>
+		provide a partition information file which is used for identifying the
+		partitions / file systems (see description below)
 	
--restore
- 	restores a backup to device (currently not implemented)
+	-s,--serial <arg>
+		connect to the device with serial number, only needed when there is
+		more then one device connected
 
-
-Beside the application modes, there are some options which influence the behaviour
--bd,--baseDir <arg>
-	defines the base directory to backup to / restore from
-	(default is current directory)
-
--h,--help
-	print help overview
+	-t,--tar
+		use tar mode for backup / restore
+		
+	-td,--tooldir <arg>
+		define path to tools directory where adb / fastboot are located
+		(if not provided, adb and fastboot must be in the users path (!))
 	
--i,--image
-	use image mode for backup / restore
+	-tsf,--timeStampFormat <arg>
+		create a timestamped sub directory in backup mode using format (e.g. 'yyyy-MM-dd-hh-mm')
+		Valid format strings are all format strings which are valid for the Java DateFormat method
 
--pif,--partitionInfoFile <arg>
-	provide a partition information file which is used for identifying the parttions / file systems
+3) Partition names / file system names
+	Unfortunately the storage of different Android devices is partitioned in many different ways
+	and there is no unique name how a partition is named. For example the recovery partition some-
+	times is names RECOVERY, sometimes SOS. The cache partition sometimes is called CACHE, sometimes
+	CAC and so on. Even worse, also the location is different on different devices.
+	ART shall be usable not only for one or two specific devices, but should support almost all
+	android devices, so there is the chance to provide a partition information file which contains
+	the required information. The partition information file is primary a XML file which contains a
+	map of device names with a list of partition information entries related to it.
+	The map key is the device name, which is derived from /proc/cpuinfo.
 
--s,--serial <arg>
-	connect to the device with serial number
+	Each partition contains several attributes. Currently only a few attributes are really used:
+	- partitionName (the name to be passed as parameter to ART)
+	- flashFileName (if empty, partitionName will be used as backup)
+	- deviceName (low level name of the device)
+	The other attributes currently are not used, but will be most likely in future versions. 
+
+	Here is the partition information file currently embedded into ART. It contains partition
+	definitions for Samsung Galaxy S2 (i9100), Nexus 7 and HTC Dream (Google G1):
 	
--t,--tar
-	use tar mode for backup / restore
+	<map>
+	  <entry>
+	    <string>SMDK4210</string>
+	    <list>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="EFS"
+	      		flashFileName="efs.img" deviceName="/dev/block/mmcblk0p1" mountPoint="/efs"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="SBL1"
+	      		flashFileName="Sbl.bin" deviceName="/dev/block/mmcblk0p2"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="SBL2"
+	      		flashFileName="" deviceName="/dev/block/mmcblk0p3"/>
+	      <PartitionInfo type="j4fs" startBlock="0" blockCount="0" partitionName="PARAM"
+	      		flashFileName="param.lfs" deviceName="/dev/block/mmcblk0p4"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="KERNEL"
+	      		flashFileName="zImage" deviceName="/dev/block/mmcblk0p5"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="RECOVERY"
+	      		flashFileName="" deviceName="/dev/block/mmcblk0p6"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="CACHE"
+	      		flashFileName="cache.img" deviceName="/dev/block/mmcblk0p7" mountPoint="/cache"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="MODEM"
+	      		flashFileName="modem.bin" deviceName="/dev/block/mmcblk0p8"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="FACTORYFS"
+	      		flashFileName="factoryfs.img" deviceName="/dev/block/mmcblk0p9" mountPoint="/system"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="DATAFS"
+	      		flashFileName="data.img" deviceName="/dev/block/mmcblk0p10" mountPoint="/data"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="UMS"
+	      		flashFileName="" deviceName="/dev/block/mmcblk0p11" mountPoint="/sdcard"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="HIDDEN"
+	      		flashFileName="hidden.img" deviceName="/dev/block/mmcblk0p12" mountPoint="/preload"/>
+	    </list>
+	  </entry>
+	  <entry>
+	    <string>grouper</string>
+	    <list>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="12288" partitionName="SOS"
+	      		flashFileName="recovery.img" deviceName="/dev/block/mmcblk0p1"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="8192" partitionName="LNX"
+	      		flashFileName="boot.img" deviceName="/dev/block/mmcblk0p2"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="665600" partitionName="APP"
+	      		flashFileName="system.img" deviceName="/dev/block/mmcblk0p3" mountPoint="/system"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="453632" partitionName="CAC"
+	      		flashFileName="cache.img" deviceName="/dev/block/mmcblk0p4" mountPoint="/cache"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="512" partitionName="MSC"
+	      		flashFileName="misc.img" deviceName="/dev/block/mmcblk0p5"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="10240" partitionName="USP"
+	      		flashFileName="bootloader.img" deviceName="/dev/block/mmcblk0p6"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="5120" partitionName="PER"
+	      		flashFileName="" deviceName="/dev/block/mmcblk0p7"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="512" partitionName="MDA"
+	      		flashFileName="" deviceName="/dev/block/mmcblk0p8"/>
+	      <PartitionInfo type="ext4" startBlock="0" blockCount="0" partitionName="UDA"
+	      		flashFileName="userdata.img" deviceName="/dev/block/mmcblk0p9" mountPoint="/data"/>
+	    </list>
+	  </entry>
+	  <entry>
+	    <string>trout</string>
+	    <list>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="misc"
+	      		flashFileName="misc.img" deviceName="/dev/mtd/mtd0ro"/>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="recovery"
+	      		flashFileName="recovery.img" deviceName="/dev/mtd/mtd1ro"/>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="boot"
+	      		flashFileName="boot.img" deviceName="/dev/mtd/mtd2ro"/>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="system"
+	      		flashFileName="system.img" deviceName="/dev/mtd/mtd3ro" mountPoint="/system"/>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="cache"
+	      		flashFileName="cache.img" deviceName="/dev/mtd/mtd4ro" mountPoint="/cache"/>
+	      <PartitionInfo type="yaffs2" startBlock="0" blockCount="0" partitionName="userdata"
+	      		flashFileName="userdata.img" deviceName="/dev/mtd/mtd5ro" mountPoint="/data"/>
+	    </list>
+	  </entry>
+	</map>
 	
--td,--tooldir <arg>
-	define path to tools directory where adb / fastboot are located
-	(if not provided, adb and fastboot must be in the users path)
 
--tsf,--timeStampFormat <arg>
-	create a timestamped sub directory in backup mode using format (e.g. 'yyyy-MM-dd-hh-mm')
+Now lets have a look at some examples how to use ART:
+	
+	1) List connected devices
+	
+		$ art.sh -devices
+		connected devices:
+		123ee2274abc11
+	
+	2) Backup recovery partition of the connected device as an image
+	
+		$ art.sh -backup -i -td /export/toolsdir/ -bd /backups -tsf yyyy-MM-dd-hh-mm RECOVERY
+		transferring /backups/2013-03-20-20-00/RECOVERY.img...................finished
+		size: 8193939 
+		transferring /backups/2013-03-20-20-00/RECOVERY.img.md5.finished
+		size:37
+	
+		Beside the image backup itself, a file containing the md5 hash value of the backup file
+		will be created and a verification of the transferred file with the md5 sum takes place!
 
-Examples:
-=========
-
-List connected devices
-
-	$ art.sh -devices
-	connected devices:
-	123ee2274abc11
-
-Backup recovery partition of device as an image
-
-	$ art.sh -backup -i -td /export/toolsdir/ -bd /backups -tsf yyyy-MM-dd-hh-mm RECOVERY
-	transferring /backups/2013-03-20-20-00/RECOVERY.img...................finished
-	size: 8193939 
-	transferring /backups/2013-03-20-20-00/RECOVERY.img.md5.finished
-	size:37
-
-	btw.: a md5 verification takes place!
-
-...
+	3) Backup /system as a tar file
+	
+		$ art.sh -backup -t -td /export/toolsdir/ -bd /backups -tsf yyyy-MM-dd-hh-mm /system
+		transferring /backups/2013-03-20-20-00/system.tar...................finished
+		size: 458119938
+		transferring /backups/2013-03-20-20-00/system.tar.md5.finished
+		size:37
+	
+	4) Backup system partition of the connected device passing a partition table 
+	
+		$ art.sh -backup -i -td /export/toolsdir/ -bd /backups -tsf yyyy-MM-dd-hh-mm -pif /config/i9100.pif RECOVERY
+		transferring /backups/2013-03-20-20-00/RECOVERY.img...................finished
+		size: 8193939 
+		transferring /backups/2013-03-20-20-00/RECOVERY.img.md5.finished
+		size:37
  
