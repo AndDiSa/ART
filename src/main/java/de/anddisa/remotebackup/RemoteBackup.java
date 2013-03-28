@@ -66,6 +66,11 @@ public class RemoteBackup {
 				.withLongOpt("help")
 				.withDescription("print help")
 				.create("h"));
+		commands.addOption(OptionBuilder
+				.withLongOpt("reboot")
+				.withDescription("reboot device")
+				.hasOptionalArg()
+				.create("r"));
         options.addOptionGroup(commands);
         OptionGroup mode = new OptionGroup();
         mode.addOption(OptionBuilder
@@ -169,6 +174,10 @@ public class RemoteBackup {
 	            // do something with devices
 	        	return doInfo(adbWrapper, cl);
 	        }
+	        if ((null != cl) && cl.hasOption("reboot")) {
+	            // do something with devices
+	        	return doReboot(adbWrapper, cl);
+	        }
 	        return outputCommandLineHelp("", options);			
 		} else {
 			throw new ApplicationException("error: no device found");			
@@ -257,6 +266,26 @@ public class RemoteBackup {
 	 */
 	private static String doRestore(AdbWrapper adbWrapper, CommandLine cl)  throws ApplicationException {
 		throw new ApplicationException("not implemented yet");
+	}
+
+    /**
+     * reboot command
+     * 
+     * @param adbWrapper
+     * @param cl
+     * @return
+     */
+	private static String doReboot(AdbWrapper adbWrapper, CommandLine cl) {
+		String arg = cl.getOptionValue("reboot");
+		
+		if ("recovery".equals(arg)) {
+			adbWrapper.rebootIntoRecovery();
+		} else if ("bootloader".equals(arg)) {
+			adbWrapper.rebootIntoBootloader();
+		} else {
+			adbWrapper.reboot();
+		}
+		return "";
 	}
 
 	/**

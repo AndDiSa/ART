@@ -7,7 +7,7 @@
 
 (AndDiSa | Android | Adb) Remote Toolkit
 
-Version 0.1 alpha / 26.03.2013
+Version 0.2 alpha / 28.03.2013
 
 
 ART is a toolkit which helps to manage Android devices remotely, i.e. directly from your PC.
@@ -54,6 +54,8 @@ takes place by passing one of the following options to the command line:
 	-restore
 	 	restores a backup to device (currently not implemented)
 
+	-reboot {recovery | bootloader }
+	 	reboots the device (to system, to recovery, to bootloader)
 
 2) Beside the application modes, there are some options which influence the behaviour
 of the different modes / adapts the application to the current environment 
@@ -214,4 +216,7 @@ Now lets have a look at some examples how to use ART:
 		size: 8193939 
 		transferring /backups/2013-03-20-20-00/RECOVERY.img.md5.finished
 		size:37
- 
+
+	5) Reboot device 
+	
+		$ art.sh -reboot 
