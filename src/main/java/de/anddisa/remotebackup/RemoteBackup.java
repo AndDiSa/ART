@@ -38,6 +38,7 @@ import de.anddisa.adb.device.PartitionInfo;
 import de.anddisa.adb.device.TestDeviceState;
 import de.anddisa.adb.device.ITestDevice.MountPointInfo;
 import de.anddisa.adb.util.CommandResult;
+import de.anddisa.remotebackup.utils.MD5Utils;
 
 public class RemoteBackup {
 
@@ -336,7 +337,7 @@ public class RemoteBackup {
 					result |= adbWrapper.getPartitionAsImage(partition, flashFileName);
 					result |= adbWrapper.getPartitionMD5(partition, flashFileName + ".md5");
 					try {
-						boolean compareMD5 = AdbWrapper.compareMD5(flashFileName, flashFileName + ".md5");
+						boolean compareMD5 = MD5Utils.compareMD5(flashFileName, flashFileName + ".md5");
 						if (!compareMD5) {
 							resultString += flashFileName + "verification failed\n";
 						}

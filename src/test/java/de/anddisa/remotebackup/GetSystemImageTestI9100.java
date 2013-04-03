@@ -18,6 +18,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.anddisa.remotebackup.utils.MD5Utils;
+
 public class GetSystemImageTestI9100 {
 
 	static AdbWrapper adbWrapper = null;
@@ -52,15 +54,15 @@ public class GetSystemImageTestI9100 {
 		Assert.assertTrue(adbWrapper.getPartitionAsImage("PRE", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img"));
 		Assert.assertTrue(adbWrapper.getPartitionMD5("PRE", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img.md5"));
 		*/
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/EFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/EFS.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL1.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL1.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL2.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL2.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/PARAM.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PARAM.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/KERNEL.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/KERNEL.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/RECOVERY.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/RECOVERY.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/MODEM.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/MODEM.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/FACTORYFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/FACTORYFS.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img.md5"));
-		Assert.assertTrue(AdbWrapper.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/DATAFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/DATAFS.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/EFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/EFS.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL1.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL1.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL2.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/SBL2.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/PARAM.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PARAM.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/KERNEL.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/KERNEL.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/RECOVERY.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/RECOVERY.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/MODEM.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/MODEM.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/FACTORYFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/FACTORYFS.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/PRE.img.md5"));
+		Assert.assertTrue(MD5Utils.compareMD5("/home/ds/nas-archive/systems/android/GT-I9100/backups/DATAFS.img", "/home/ds/nas-archive/systems/android/GT-I9100/backups/DATAFS.img.md5"));
 	}
 }
