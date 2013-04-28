@@ -1,9 +1,12 @@
 package de.anddisa.remotebackup.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -66,8 +69,26 @@ public class MD5Utils {
 	    // format md5
 	    byte[] md5 = md.digest();
 	    BigInteger bi = new BigInteger(1, md5);
-	    
-	    return bi.toString(16);	// print out as HEX number
-	}
+	    String result = String.format("%032x", bi);
 
+	    return result;
+	}
+	
+	public static String md5sumFromString(String input) throws IOException, NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("MD5");
+	
+		// read file and calculate md5
+	    ByteArrayInputStream sr = new ByteArrayInputStream(input.getBytes());
+	    byte[] buffer = new byte[8192];
+	    int read = 0;
+	    while( (read = sr.read(buffer)) > 0)
+	            md.update(buffer, 0, read);
+
+	    // format md5
+	    byte[] md5 = md.digest();
+	    BigInteger bi = new BigInteger(1, md5);
+	    String result = String.format("%032x", bi);
+
+	    return result;
+	}
 }

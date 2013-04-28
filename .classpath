@@ -24,11 +24,13 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/ddmlib.jar"/>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/ddmuilib.jar"/>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/sdkstats.jar"/>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/swt.jar"/>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/swtmenubar.jar"/>
-	<classpathentry kind="lib" path="/vmware-images/android-aosp/out/host/linux-x86/framework/sdklib.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/ddmlib-r16.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/sdklib.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/sdkstats.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/xpp3_min-1.1.3.4.O.jar"/>
+	<classpathentry kind="lib" path="/home/ds/remote-backup/xstream-1.2.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
