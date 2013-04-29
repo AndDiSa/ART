@@ -97,7 +97,7 @@ public class RemoteBackup {
         options.addOptionGroup(location);
         options.addOption(OptionBuilder
         		.withLongOpt("serial")
-        		.withDescription("connect tot device with serial number")
+        		.withDescription("connect to device with serial number")
         		.isRequired(false)
         		.hasArg()
         		.create("s"));
