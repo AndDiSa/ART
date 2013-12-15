@@ -1,0 +1,1 @@
+art.sh -backup -i -tsf "yyyy-MM-dd-hh-mm" EFS SBL1 PARAM KERNEL CACHE MODEM FACTORYFS DATAFS HIDDEN
